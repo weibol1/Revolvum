@@ -11,6 +11,7 @@ import big_screw
 import little_screw
 import saw_blade
 import player
+import hammer
 from pygame import mixer
 
 def resource_path(relative_path):
@@ -326,134 +327,6 @@ class Saw_boss(pygame.sprite.Sprite):
             name_font = pygame.font.Font(resource_path('assets/fonts/FieldGuide.ttf'), 24)
             name_text = name_font.render("Ripjaw", True, (0, 0, 0))
             screen.blit(name_text, (445, 3))
-
-class Hammer(pygame.sprite.Sprite):
-    def __init__(self, x, y):
-        super().__init__()
-        self.x = x
-        self.y = y
-        self.image = hammer_img
-        self.rect = self.image.get_rect(topleft=(self.x, self.y))
-        self.original_image = hammer_img
-        self.hitbox = pygame.Rect(self.x, self.y, 32, 32)
-        self.movement = False
-        self.movement_speed = 10
-        self.firing = False
-        self.intro_shown = True
-        self.intro_wall_shown = True
-
-        # stuff for pygame masks
-        self.mask = pygame.mask.from_surface(self.image)
-
-        #debugging display mask
-        self.mask_image = self.mask.to_surface()
-
-        # firing stuff
-        self.firing_up = False
-        self.firing_side = False
-        self.firing_left = False
-        self.firing_right = False
-        self.firing = False
-        self.firing_timer = 0
-
-        # spinning for the image
-        self.spinning = True
-        self.angle = 0
-
-    def move(self):
-        self.firing_timer += 1
-
-        # hammer firing the two sides
-        if keys[pygame.K_j] and self.firing_timer > 30 and not self.firing_up and not self.firing_right and not self.firing_side:
-            hammer_sound.play()
-            self.firing_side = True
-            self.firing_timer = 0
-            self.firing_left = True
-
-        if keys[pygame.K_l] and self.firing_timer > 30 and not self.firing_up and not self.firing_left and not self.firing_side:
-            hammer_sound.play()
-            self.firing_side = True
-            self.firing_timer = 0
-            self.firing_right = True
-
-        if self.firing_right:
-            self.draw()
-            self.x += self.movement_speed
-
-        if self.firing_left:
-            self.draw()
-            self.x -= self.movement_speed
-
-        if self.x > 1280 or self.x < 0:
-            self.firing_left = False
-            self.firing_right = False
-            self.firing_side = False
-            self.x = player_1.x
-            self.y = player_1.y
-            if game_state.state == 'intro':
-                self.x = player_1_intro.x
-                self.y = player_1_intro.y
-
-        # hammer firing up
-        if keys[pygame.K_i] and self.firing_timer > 30 and not self.firing_side and not self.firing_up:
-            hammer_sound.play()
-            self.firing_up = True
-            self.firing_timer = 0
-
-        if self.firing_up:
-            self.draw()
-            self.y -= self.movement_speed
-
-        if self.y <= 0:
-            self.x, self.y = player_1.x, player_1.y
-            if game_state.state == 'intro':
-                self.x = player_1_intro.x
-                self.y = player_1_intro.y
-            self.firing_up = False
-
-        # moving the hammer to the player x and y when updated
-        if not self.firing_side and not self.firing_up:
-            if self.x != player_1.x:
-                self.x = player_1.x
-
-            if self.y != player_1.y:
-                self.y = player_1.y
-
-            if game_state.state == 'intro':
-                if self.x != player_1_intro.x:
-                    self.x = player_1_intro.x
-
-                if self.y != player_1_intro.y:
-                    self.y = player_1_intro.y
-
-        # spinning the hammer to hit the enemies
-        self.angle += 5
-        self.angle %= 360
-        self.image = pygame.transform.rotate(self.original_image, self.angle)
-
-    def draw(self):
-        # Update rect to match the new position (taking rotation into account)
-        self.rect.topleft = (self.x, self.y)
-        self.hitbox.x = self.x
-        self.hitbox.y = self.y
-
-        # Rotate the image around its center
-        rotated_image = pygame.transform.rotate(self.image, self.angle)
-        rotated_rect = rotated_image.get_rect(center=self.rect.center)
-
-        # Update the mask for the rotated image (for accurate collision detection)
-        self.mask = pygame.mask.from_surface(rotated_image)
-
-        # Draw the rotated hammer image
-        screen.blit(rotated_image, rotated_rect.topleft)
-
-        '''# --- Debugging: Draw the mask ---
-        # Create a surface from the mask to visualize it
-        mask_surface = self.mask.to_surface()
-        mask_surface.set_colorkey((0, 0, 0))  # Make black (transparent) pixels invisible
-
-        # Draw the mask over the screen (with the same rotation and position)
-        screen.blit(mask_surface, rotated_rect.topleft)'''
 
 class Options_references(pygame.sprite.Sprite):
     def __init__(self):
@@ -933,7 +806,7 @@ class GameState:
         if player_1_intro.movement:
             player_1_intro.move(pressed_key, jump_sound, dash_sound)
             if not hammer_1.intro_shown:
-                hammer_1.move()
+                hammer_1.move(pressed_key, hammer_sound, player_1.x, player_1.y, player_1_intro.x, player_1_intro.y, game_state.state, screen)
 
     def level1(self):
         screen.fill((20, 20, 20))
@@ -1074,7 +947,7 @@ class GameState:
 
         hammer_1.firing_timer += 1
         if player_1.movement:
-            hammer_1.move()
+            hammer_1.move(pressed_key, hammer_sound, player_1.x, player_1.y, player_1_intro.x, player_1_intro.y, game_state.state, screen)
 
         if player_1.health <= 0:
             player_1.game_over_timer += 1
@@ -1341,7 +1214,7 @@ class GameState:
             player_1.move(pressed_key, jump_sound, dash_sound)
         if not player_1.game_over and not bigscrew1.opening_shown:
             hammer_1.firing_timer += 1
-            hammer_1.move()
+            hammer_1.move(pressed_key, hammer_sound, player_1.x, player_1.y, player_1_intro.x, player_1_intro.y, game_state.state, screen)
 
         if player_1.health <= 0:
             player_1.game_over_timer += 1
@@ -1639,7 +1512,7 @@ class GameState:
         hammer_1.firing_timer += 1
         if not player_1.game_over and not saw_boss1.beginning_movement:
             player_1.movement = True
-            hammer_1.move()
+            hammer_1.move(pressed_key, hammer_sound, player_1.x, player_1.y, player_1_intro.x, player_1_intro.y, game_state.state, screen)
 
         # game over condition for the player
         if player_1.health <= 0:
@@ -1751,7 +1624,7 @@ class GameState:
 
 # general class calling
 player_1 = player.Player(100, 540, player_img)
-hammer_1 = Hammer(100, 600)
+hammer_1 = hammer.Hammer(100, 600, hammer_img)
 controller_reference = Controller_references()
 
 # main menu class calling
