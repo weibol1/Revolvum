@@ -8,6 +8,7 @@ import button
 import little_disc
 import big_disc
 import big_screw
+import little_screw
 from pygame import mixer
 
 def resource_path(relative_path):
@@ -323,51 +324,6 @@ class Player(pygame.sprite.Sprite):
 
         # Draw the mask over the player at the same position
         screen.blit(mask_surface, self.rect.topleft)'''
-
-class Little_screw(pygame.sprite.Sprite):
-    def __init__(self, x, y):
-        super().__init__()
-        self.x = x
-        self.y = y
-        self.image = screw_img
-        self.original_image = screw_img  # Store the original image to avoid permanent rotation
-        self.rect = self.image.get_rect(topleft=(self.x, self.y))
-        self.phase_1 = False
-        self.phase_1_timer = 0
-        self.movement_speed = 10  # Speed of the disc
-
-        # Stuff for the firing of the screw to the left and right
-        self.screw_side = random.randint(1, 2)
-        self.firing_right = False
-        self.firing_left = False
-        self.firing_timer = 0
-
-        # Rotation angle for this instance
-        self.angle = 0  # Initial angle
-
-        # Stuff for pygame masks
-        self.mask = pygame.mask.from_surface(self.image)
-
-    def rotate(self, angle):
-        """Rotate the image by the specified angle."""
-        self.angle = angle
-        # Rotate the original image, and update the image and rect accordingly
-        self.image = pygame.transform.rotate(self.original_image, self.angle)
-        self.rect = self.image.get_rect(center=self.rect.center)  # Keep the position the same
-
-        # Update the mask after rotation
-        self.mask = pygame.mask.from_surface(self.image)
-
-    def draw(self):
-        self.rect.topleft = (self.x, self.y)
-
-        # Update the mask before drawing (in case position changed)
-        self.mask = pygame.mask.from_surface(self.image)
-
-        screen.blit(self.image, self.rect.topleft)
-
-        # Uncomment to see the mask rectangle for debugging
-        # pygame.draw.rect(screen, (255, 0, 0), self.rect, 2)
 
 class Saw_boss(pygame.sprite.Sprite):
     def __init__(self, x, y):
@@ -760,7 +716,7 @@ def game_over_func():
 
 class GameState:
     def __init__(self):
-        self.state = 'mainmenu'
+        self.state = 'level2'
         self.music_playing = False
         self.current_music = None  # Track the currently playing music
         self.intro_played = False  # Flag to track if intro music has been played
@@ -1469,7 +1425,7 @@ class GameState:
             littlescrew1.phase_1_timer += 1
 
             for screw in little_screw:
-                screw.draw()
+                screw.draw(screen)
                 screw.movement_speed = random.randint(9, 13)
                 screw.y += screw.movement_speed
 
@@ -1479,7 +1435,7 @@ class GameState:
                     screw.movement_speed = random.randint(8, 12)
 
             # code for the screw to move from either side
-            littlescrew12.draw()
+            littlescrew12.draw(screen)
             littlescrew1.firing_timer += 1
 
             if bigscrew1.stationary_timer >= 240:
@@ -1533,14 +1489,14 @@ class GameState:
                         bigscrew1.firing_timer = 0
 
         if bigscrew1.firing and bigscrew1.phase_2_stationary_timer >= 120:
-            littlescrew11.draw()
+            littlescrew11.draw(screen)
 
         if bigscrew1.phase_2:
             bigscrew1.phase_2_timer += 1
             bigscrew1.phase_2_stationary_timer += 1
 
             if bigscrew1.phase_2_stationary_timer >= 60:
-                littlescrew11.draw()
+                littlescrew11.draw(screen)
 
             if bigscrew1.phase_2_timer <= phase_time and bigscrew1.phase_2_stationary_timer >= 120:
                 # Define the target position for bigscrew1 with an offset
@@ -2024,18 +1980,18 @@ littlediscs = [littledisc1, littledisc2, littledisc3, littledisc4]
 
 # level 2 class calling
 bigscrew1 = big_screw.Big_Screw(600, 120, screw_boss_img)
-littlescrew1 = Little_screw(random.randint(32, 1248), -500)
-littlescrew2 = Little_screw(random.randint(32, 1248), -100)
-littlescrew3 = Little_screw(random.randint(32, 1248), -700)
-littlescrew4 = Little_screw(random.randint(32, 1248), -100)
-littlescrew5 = Little_screw(random.randint(32, 1248), -300)
-littlescrew6 = Little_screw(random.randint(32, 1248), -100)
-littlescrew7 = Little_screw(random.randint(32, 1248), -200)
-littlescrew8 = Little_screw(random.randint(32, 1248), -100)
-littlescrew9 = Little_screw(random.randint(32, 1248), -400)
-littlescrew10 = Little_screw(random.randint(32, 1248), -100)
-littlescrew11 = Little_screw(100, 300)
-littlescrew12 = Little_screw(-80, 560)
+littlescrew1 = little_screw.Little_screw(random.randint(32, 1248), -500, screw_img)
+littlescrew2 = little_screw.Little_screw(random.randint(32, 1248), -100, screw_img)
+littlescrew3 = little_screw.Little_screw(random.randint(32, 1248), -700, screw_img)
+littlescrew4 = little_screw.Little_screw(random.randint(32, 1248), -100, screw_img)
+littlescrew5 = little_screw.Little_screw(random.randint(32, 1248), -300, screw_img)
+littlescrew6 = little_screw.Little_screw(random.randint(32, 1248), -100, screw_img)
+littlescrew7 = little_screw.Little_screw(random.randint(32, 1248), -200, screw_img)
+littlescrew8 = little_screw.Little_screw(random.randint(32, 1248), -100, screw_img)
+littlescrew9 = little_screw.Little_screw(random.randint(32, 1248), -400, screw_img)
+littlescrew10 = little_screw.Little_screw(random.randint(32, 1248), -100, screw_img)
+littlescrew11 = little_screw.Little_screw(100, 300, screw_img)
+littlescrew12 = little_screw.Little_screw(-80, 560, screw_img)
 littlescrew12.rotate(90)
 
 # level 3 class calling
