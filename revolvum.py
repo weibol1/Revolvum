@@ -1933,7 +1933,7 @@ class GameState:
                 options_reference.boss_countdown -= 1
                 options_reference.boss_countdown_timer = 0
 
-        # this is for the game over shit
+        # this is for the game over
         if bigscrew1.killed_alpha >= 435:
             player_1.dash_timer = 0
             self.state = 'level3'
@@ -2228,7 +2228,7 @@ class GameState:
                 options_reference.boss_countdown -= 1
                 options_reference.boss_countdown_timer = 0
 
-        # this is for the game over shit
+        # this is for the game over
         if saw_boss1.alpha >= 435:
             player_1.dash_timer = 0
             self.state = 'end'
@@ -2350,7 +2350,7 @@ littlescrew12.rotate(90)
 saw_boss1 = Saw_boss(-300, 100)
 saw_blade1 = Saw_blade(-300, 100)
 
-# putting shit in groups
+# putting in groups
 little_screw = [littlescrew1, littlescrew2, littlescrew3, littlescrew4, littlescrew5, littlescrew6,
                         littlescrew7, littlescrew8, littlescrew9, littlescrew10]
 
