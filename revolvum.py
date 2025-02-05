@@ -4,6 +4,7 @@ import math
 import webbrowser
 import sys
 import os
+import button
 from pygame import mixer
 
 def resource_path(relative_path):
@@ -161,25 +162,6 @@ jump_sound = pygame.mixer.Sound(resource_path('assets/sounds/jump.ogg'))
 pygame.display.set_icon(little_disc_img)
 
 # classes
-class Button:
-    def __init__(self, x, y, image, scale):
-        height = image.get_height()
-        width = image.get_width()
-        self.image = pygame.transform.scale(image, (int(width * scale), int(height * scale)))
-        self.rect = self.image.get_rect()
-        self.rect.topleft = (x, y)
-
-    def draw(self):
-        # mouse position
-        pos = pygame.mouse.get_pos()
-
-        screen.blit(self.image, (self.rect.x, self.rect.y))
-
-        if pygame.mouse.get_pressed()[0] and self.rect.collidepoint(pos):
-            return True
-
-        else:
-            return False
 
 class Player(pygame.sprite.Sprite):
     def __init__(self, x, y):
@@ -1149,30 +1131,30 @@ class GameState:
         screen.blit(title, (350, 20))
 
         # main menu buttons
-        if start_button_menu.draw():
+        if start_button_menu.draw(screen):
             self.state = 'intro'
 
-        if options_button_menu.draw():
+        if options_button_menu.draw(screen):
             self.state = 'optionsmenu'
 
-        if credits_button_menu.draw():
+        if credits_button_menu.draw(screen):
             self.state = 'creditsmenu'
 
-        if exit_button_menu.draw():
+        if exit_button_menu.draw(screen):
             running = False
 
         # buttons to the different links
         options_reference.link_timer += 1
 
-        if youtube_button.draw() and options_reference.link_timer >= 5:
+        if youtube_button.draw(screen) and options_reference.link_timer >= 5:
             webbrowser.open("https://www.youtube.com/@GhastlyGamez")
             options_reference.link_timer = 0
 
-        if discord_button.draw() and options_reference.link_timer >= 5:
+        if discord_button.draw(screen) and options_reference.link_timer >= 5:
             webbrowser.open("https://discord.gg/jB7gUKPDK7")
             options_reference.link_timer = 0
 
-        if website_button.draw() and options_reference.link_timer >= 5:
+        if website_button.draw(screen) and options_reference.link_timer >= 5:
             webbrowser.open("https://www.ghastlygames.net")
             options_reference.link_timer = 0
 
@@ -1255,11 +1237,11 @@ class GameState:
         screen.blit(credit7_text, (350, 630))
 
         # fullscreen and windowed options along with text
-        if left_button2.draw():
+        if left_button2.draw(screen):
             options_reference.fullscreenshown = False
             options_reference.windowedshown = True
 
-        if right_button2.draw():
+        if right_button2.draw(screen):
             options_reference.windowedshown = False
             options_reference.fullscreenshown = True
 
@@ -1274,16 +1256,16 @@ class GameState:
         if options_reference.volume < 0:
             options_reference.volume = 0
 
-        if left_button3.draw() and controller_reference.b_timer >= 8:
+        if left_button3.draw(screen) and controller_reference.b_timer >= 8:
             controller_reference.b_timer = 0
             options_reference.volume -= 1
 
-        if right_button3.draw() and controller_reference.b_timer >= 8:
+        if right_button3.draw(screen) and controller_reference.b_timer >= 8:
             controller_reference.b_timer = 0
             options_reference.volume += 1
 
         # apply button for the changing of display
-        if applybut.draw() and controller_reference.b_timer >= 60:
+        if applybut.draw(screen) and controller_reference.b_timer >= 60:
             controller_reference.b_timer = 0
             if options_reference.fullscreenshown:
                 screen = pygame.display.set_mode((1280, 720), pygame.HWSURFACE | pygame.DOUBLEBUF | pygame.FULLSCREEN)
@@ -2260,15 +2242,15 @@ class GameState:
         # buttons to the different links
         options_reference.link_timer += 1
 
-        if youtube_button2.draw() and options_reference.link_timer >= 5:
+        if youtube_button2.draw(screen) and options_reference.link_timer >= 5:
             webbrowser.open("https://www.youtube.com/@GhastlyGamez")
             options_reference.link_timer = 0
 
-        if discord_button2.draw() and options_reference.link_timer >= 5:
+        if discord_button2.draw(screen) and options_reference.link_timer >= 5:
             webbrowser.open("https://discord.gg/jB7gUKPDK7")
             options_reference.link_timer = 0
 
-        if website_button2.draw() and options_reference.link_timer >= 5:
+        if website_button2.draw(screen) and options_reference.link_timer >= 5:
             webbrowser.open("https://www.ghastlygames.net")
             options_reference.link_timer = 0
 
@@ -2296,27 +2278,27 @@ hammer_1 = Hammer(100, 600)
 controller_reference = Controller_references()
 
 # main menu class calling
-start_button_menu = Button(50, 250, start_button, 1)
-options_button_menu = Button(50, 350, options_button, 1)
-credits_button_menu = Button(50, 450, credits_button, 1)
-exit_button_menu = Button(50, 550, exit_button, 1)
-discord_button = Button(1180, 635, discord_img, 1)
-youtube_button = Button(1080, 640, youtube_img, 1)
-website_button = Button(980, 625, ghastly_img, 1)
-discord_button2 = Button(690, 635, discord_img, 1)
-youtube_button2 = Button(580, 640, youtube_img, 1)
-website_button2 = Button(480, 625, ghastly_img, 1)
+start_button_menu = button.Button(50, 250, start_button, 1)
+options_button_menu = button.Button(50, 350, options_button, 1)
+credits_button_menu = button.Button(50, 450, credits_button, 1)
+exit_button_menu = button.Button(50, 550, exit_button, 1)
+discord_button = button.Button(1180, 635, discord_img, 1)
+youtube_button = button.Button(1080, 640, youtube_img, 1)
+website_button = button.Button(980, 625, ghastly_img, 1)
+discord_button2 = button.Button(690, 635, discord_img, 1)
+youtube_button2 = button.Button(580, 640, youtube_img, 1)
+website_button2 = button.Button(480, 625, ghastly_img, 1)
 big_disc_main_menu = Big_disc(535, 100)
 bigscrew_main_menu = Big_Screw(20, 10)
 saw_boss_main_menu = Saw_boss(-300, 600)
 
 # options menu class calling
 options_reference = Options_references()
-left_button2 = Button(100, 350, left_arrow, 1)
-right_button2 = Button(500, 350, right_arrow, 1)
-left_button3 = Button(700, 350, left_arrow, 1)
-right_button3 = Button(1150, 350, right_arrow, 1)
-applybut = Button(240, 500, apply_button, 1)
+left_button2 = button.Button(100, 350, left_arrow, 1)
+right_button2 = button.Button(500, 350, right_arrow, 1)
+left_button3 = button.Button(700, 350, left_arrow, 1)
+right_button3 = button.Button(1150, 350, right_arrow, 1)
+applybut = button.Button(240, 500, apply_button, 1)
 
 # intro class calling
 player_1_intro = Player(20, 540)
