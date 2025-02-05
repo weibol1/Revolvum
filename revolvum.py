@@ -9,6 +9,7 @@ import little_disc
 import big_disc
 import big_screw
 import little_screw
+import saw_blade
 from pygame import mixer
 
 def resource_path(relative_path):
@@ -478,44 +479,6 @@ class Saw_boss(pygame.sprite.Sprite):
             name_text = name_font.render("Ripjaw", True, (0, 0, 0))
             screen.blit(name_text, (445, 3))
 
-class Saw_blade(pygame.sprite.Sprite):
-    def __init__(self, x, y):
-        super().__init__()
-        self.x = x
-        self.y = y
-        self.image = saw_img
-        self.rect = self.image.get_rect(topleft=(self.x, self.y))
-
-        # Phase 2 behavior
-        self.blade_shown = False
-        self.phase_2_stationary_timer = 0  # Timer for how long the blade remains still
-        self.velocity_y = -10
-        self.gravity = 0.5  # Gravity for downward motion
-        self.bounce_velocity = -10  # Velocity when bouncing off the ground
-        self.horizontal_speed = 10  # Speed for left/right movement
-        self.bouncing = False
-        self.moving_left = False
-        self.moving_right = False
-
-        # Reset movement position after its phase
-        self.movement_speed = 5
-        self.movement_position = False
-        self.moving_position = False
-
-        # Collision detection
-        self.mask = pygame.mask.from_surface(self.image)
-
-    def draw(self):
-        # Ensure hitbox updates each frame
-        self.rect.topleft = (self.x, self.y)
-        self.mask = pygame.mask.from_surface(self.image)
-
-        # Draw the saw blade
-        screen.blit(self.image, (self.x, self.y))
-
-        # Debugging: Uncomment to visualize hitboxes
-        # pygame.draw.rect(screen, (255, 0, 0), self.rect, 2)
-
 class Hammer(pygame.sprite.Sprite):
     def __init__(self, x, y):
         super().__init__()
@@ -716,7 +679,7 @@ def game_over_func():
 
 class GameState:
     def __init__(self):
-        self.state = 'level2'
+        self.state = 'mainmenu'
         self.music_playing = False
         self.current_music = None  # Track the currently playing music
         self.intro_played = False  # Flag to track if intro music has been played
@@ -1604,7 +1567,7 @@ class GameState:
 
         # calling boss to screen
         if saw_blade1.blade_shown and not player_1.game_over and not saw_boss1.killed:
-            saw_blade1.draw()
+            saw_blade1.draw(screen)
 
         if not saw_boss1.killed:
             saw_boss1.draw()
@@ -1996,7 +1959,7 @@ littlescrew12.rotate(90)
 
 # level 3 class calling
 saw_boss1 = Saw_boss(-300, 100)
-saw_blade1 = Saw_blade(-300, 100)
+saw_blade1 = saw_blade.Saw_blade(-300, 100, saw_img)
 
 # putting in groups
 little_screw = [littlescrew1, littlescrew2, littlescrew3, littlescrew4, littlescrew5, littlescrew6,
