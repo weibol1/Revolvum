@@ -10,6 +10,7 @@ import big_disc
 import big_screw
 import little_screw
 import saw_blade
+import saw_boss
 import player
 import hammer
 from pygame import mixer
@@ -175,159 +176,6 @@ pygame.display.set_icon(little_disc_img)
 
 # classes
 
-class Saw_boss(pygame.sprite.Sprite):
-    def __init__(self, x, y):
-        super().__init__()
-        self.x = x
-        self.y = y
-        self.image = saw_shell_img
-        self.image2 = saw_img
-        self.image = pygame.transform.flip(self.image, True, False)
-        self.rect = self.image.get_rect(topleft=(self.x, self.y))
-        self.movement_speed = 6
-
-        # Beginning movement of the saw boss
-        self.beginning_movement = True
-        self.beginning_movement_timer = 0
-        self.beginning_movement_speed = 18
-        self.moving_right = True
-        self.moving_left = False
-        self.beginning_falling = False
-
-        # Blade positioning
-        self.pointing_right = True
-        self.pointing_left = False
-
-        # Phase variables
-        self.phase_1 = True
-        self.phase_1_timer = 0
-        self.phase_2 = False
-        self.phase_2_timer = 0
-        self.first_time = True
-        self.sfx_timer = 0
-
-        # Phase 1 attack
-        self.attacking = False
-        self.phase_1_attack_timer = 0
-
-        # Returning to position
-        self.moving_position = False
-
-        # Health variables
-        self.health = 50
-        self.hit_timer = 0
-        self.health_shown = False
-
-        # Death handling
-        self.killed = False
-        self.alpha = 0
-
-        # Mask for accurate collisions
-        self.update_hitbox()
-
-    def update_hitbox(self):
-        """Ensures the hitbox and mask update correctly every frame."""
-        self.rect.topleft = (self.x, self.y)  # Update rect position
-        self.mask = pygame.mask.from_surface(self.image)  # Regenerate mask
-
-    def opening_movement(self):
-        if self.moving_right:
-            self.x += self.beginning_movement_speed
-            if self.x > 1500:
-                self.moving_right = False
-                self.image = pygame.transform.flip(self.image, True, False)
-                self.pointing_right = False
-                self.pointing_left = True
-                self.moving_left = True
-                self.update_hitbox()  # Update hitbox after transformation
-
-        if self.moving_left:
-            self.x -= self.beginning_movement_speed
-            if self.x < -401:
-                self.moving_left = False
-                self.y = -200
-                self.x = 500
-                position = random.randint(1, 2)
-                if position == 1:
-                    self.image = pygame.transform.flip(self.image, True, False)
-                    self.pointing_right = True
-                    self.pointing_left = False
-                else:
-                    self.pointing_left = True
-                    self.pointing_right = False
-                self.beginning_falling = True
-                self.update_hitbox()  # Update hitbox after transformation
-
-        if self.beginning_falling:
-            self.y += 2
-            if self.y >= 100:
-                self.beginning_falling = False
-                self.phase_1 = True
-                self.beginning_movement = False
-                self.health_shown = True
-
-        self.update_hitbox()
-
-    def main_menu_movement(self):
-        self.beginning_movement_speed = 5
-        if self.moving_right:
-            self.x += self.beginning_movement_speed
-            if self.x > 1500:
-                self.moving_right = False
-                self.image = pygame.transform.flip(self.image, True, False)
-                self.pointing_right = False
-                self.pointing_left = True
-                self.moving_left = True
-                self.update_hitbox()  # Update hitbox after transformation
-
-        if self.moving_left:
-            self.x -= self.beginning_movement_speed
-            if self.x < -401:
-                self.moving_right = True
-                self.image = pygame.transform.flip(self.image, True, False)
-                self.pointing_right = True
-                self.pointing_left = False
-                self.moving_left = False
-                self.update_hitbox()  # Update hitbox after transformation
-
-        self.update_hitbox()
-
-    def draw(self):
-        """Draws the boss and updates the hitbox each frame."""
-        self.update_hitbox()
-        self.hit_timer += 1
-
-        # Draw the spinning blade
-        if not saw_blade1.blade_shown:
-            if self.pointing_right:
-                screen.blit(self.image2, (self.x + 195, self.y + 35))
-            else:
-                screen.blit(self.image2, (self.x - 15, self.y + 35))
-
-        # Draw the main boss image
-        screen.blit(self.image, (self.x, self.y))
-
-        # Debugging hitbox visualization (uncomment if needed)
-        # pygame.draw.rect(screen, (255, 0, 0), self.rect, 2)
-
-        # Draw health bar
-        if self.health_shown:
-            max_health = 50
-            health_bar_width = 400
-            health_bar_height = 15
-            health_bar_x = 448
-            health_bar_y = 35
-            current_health_width = (self.health / max_health) * health_bar_width
-
-            pygame.draw.rect(screen, (0, 0, 0), (health_bar_x - 5, health_bar_y - 5, health_bar_width + 10, health_bar_height + 10), 30)
-            pygame.draw.rect(screen, (255, 255, 255), (health_bar_x, health_bar_y, health_bar_width, health_bar_height))
-            pygame.draw.rect(screen, (255, 0, 0), (health_bar_x, health_bar_y, current_health_width, health_bar_height))
-
-            # Draw boss name
-            name_font = pygame.font.Font(resource_path('assets/fonts/FieldGuide.ttf'), 24)
-            name_text = name_font.render("Ripjaw", True, (0, 0, 0))
-            screen.blit(name_text, (445, 3))
-
 class Options_references(pygame.sprite.Sprite):
     def __init__(self):
         super().__init__()
@@ -474,7 +322,7 @@ class GameState:
         bigscrew_main_menu.draw(screen, pygame.font.Font(resource_path('assets/fonts/FieldGuide.ttf'), 24))
         bigscrew_main_menu.align_with_mouse()
 
-        saw_boss_main_menu.draw()
+        saw_boss_main_menu.draw(saw_blade1.blade_shown, screen, pygame.font.Font(resource_path('assets/fonts/FieldGuide.ttf'), 24))
         saw_boss_main_menu.main_menu_movement()
 
         # blitting the title image
@@ -1291,7 +1139,7 @@ class GameState:
             saw_blade1.draw(screen)
 
         if not saw_boss1.killed:
-            saw_boss1.draw()
+            saw_boss1.draw(saw_blade1.blade_shown, screen, pygame.font.Font(resource_path('assets/fonts/FieldGuide.ttf'), 24))
 
         # the opening movement of the saw boss
         if saw_boss1.beginning_movement:
@@ -1640,7 +1488,7 @@ youtube_button2 = button.Button(580, 640, youtube_img, 1)
 website_button2 = button.Button(480, 625, ghastly_img, 1)
 big_disc_main_menu = big_disc.Big_disc(535, 100, disc_boss_img)
 bigscrew_main_menu = big_screw.Big_Screw(20, 10, screw_boss_img)
-saw_boss_main_menu = Saw_boss(-300, 600)
+saw_boss_main_menu = saw_boss.Saw_boss(-300, 600, saw_shell_img, saw_img)
 
 # options menu class calling
 options_reference = Options_references()
@@ -1679,7 +1527,7 @@ littlescrew12 = little_screw.Little_screw(-80, 560, screw_img)
 littlescrew12.rotate(90)
 
 # level 3 class calling
-saw_boss1 = Saw_boss(-300, 100)
+saw_boss1 = saw_boss.Saw_boss(-300, 100, saw_shell_img, saw_img)
 saw_blade1 = saw_blade.Saw_blade(-300, 100, saw_img)
 
 # putting in groups
