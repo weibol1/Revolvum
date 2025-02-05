@@ -10,6 +10,7 @@ import big_disc
 import big_screw
 import little_screw
 import saw_blade
+import player
 from pygame import mixer
 
 def resource_path(relative_path):
@@ -86,6 +87,9 @@ health3 = pygame.transform.scale(health3, (96, 96))
 
 health_empty = dash_empty = pygame.image.load(resource_path("assets/img/health_empty.png")).convert_alpha()
 health_empty = pygame.transform.scale(health_empty, (96, 96))
+
+health_states = [health_full, health1, health2, health3, health_empty]
+
 dash_empty = pygame.transform.scale(dash_empty, (96, 96))
 
 dash_full = pygame.image.load(resource_path("assets/img/dash_full.png")).convert_alpha()
@@ -99,6 +103,8 @@ dash2 = pygame.transform.scale(dash2, (96, 96))
 
 dash3 = pygame.image.load(resource_path("assets/img/dash_3.png")).convert_alpha()
 dash3 = pygame.transform.scale(dash3, (96, 96))
+
+dash_states = [dash_empty, dash3, dash2, dash1, dash_full]
 
 # main menu image loading
 start_button = pygame.image.load(resource_path("assets/img/start_button.png")).convert_alpha()
@@ -167,164 +173,6 @@ jump_sound = pygame.mixer.Sound(resource_path('assets/sounds/jump.ogg'))
 pygame.display.set_icon(little_disc_img)
 
 # classes
-
-class Player(pygame.sprite.Sprite):
-    def __init__(self, x, y):
-        super().__init__()
-        self.x = x
-        self.y = y
-        self.image = player_img
-        self.original_image = player_img  # Store the original image
-        self.rect = self.image.get_rect(topleft=(self.x, self.y))
-        self.hitbox = pygame.rect.Rect(self.x, self.y + 58, 32, 8)
-
-        # Movement & physics
-        self.movement = False
-        self.movement_speed = 4
-        self.velocity_x = 0
-        self.acceleration = 0.5
-        self.friction = 0.8  # Smooth deceleration
-
-        # Jumping & Gravity
-        self.falling = True
-        self.is_jumping = False
-        self.jump_count = 30
-        self.gravity = 13  # Falling speed
-
-        # Dash stuff
-        self.dashing = False
-        self.dash_timer = 0
-        self.last_movement = 'none'
-        self.dash_velocity = 0
-        self.dash_duration = 6
-        self.dash_speed = 20
-        self.can_dash = True  # Prevents midair spam dashing
-
-        # intro stuff for the game
-        self.intro_wall_shown2 = True
-        self.text1 = True
-        self.text2 = False
-        self.text3 = False
-
-        # Health
-        self.health = 4
-        self.hit_timer = 0
-
-        # Game over
-        self.game_over = False
-        self.game_over_timer = 0
-
-        # Pygame mask (for pixel-perfect collision)
-        self.mask = pygame.mask.from_surface(self.image)
-
-    def move(self):
-        """Handles player movement, jumping, and dashing."""
-        if not self.movement:
-            return
-
-        self.hit_timer += 1
-        self.dash_timer += 1
-
-        # Left & Right Movement
-        if keys[pygame.K_a] or keys[pygame.K_LEFT]:
-            self.velocity_x -= self.acceleration
-            self.last_movement = 'left'
-        elif keys[pygame.K_d] or keys[pygame.K_RIGHT]:
-            self.velocity_x += self.acceleration
-            self.last_movement = 'right'
-        else:
-            # Apply friction to slow down
-            self.velocity_x *= self.friction
-
-        # Cap velocity
-        self.velocity_x = max(-self.movement_speed, min(self.velocity_x, self.movement_speed))
-        self.x += self.velocity_x
-
-        # Jumping
-        if not self.is_jumping and (keys[pygame.K_w] or keys[pygame.K_UP] or keys[pygame.K_SPACE]):
-            jump_sound.play()
-            self.is_jumping = True
-            self.falling = False
-            self.jump_count = 30
-
-        if self.is_jumping:
-            if self.jump_count >= -30:
-                neg = 1 if self.jump_count > 0 else -1
-                self.y -= (self.jump_count ** 2) * 0.020 * neg
-                self.jump_count -= 1
-            else:
-                self.is_jumping = False
-                self.falling = True
-                self.jump_count = 30
-
-        # Gravity (falling)
-        if self.falling:
-            self.y += self.gravity
-
-        # Dashing
-        if keys[pygame.K_LSHIFT] and self.dash_timer >= 120 and not self.dashing and self.can_dash:
-            dash_sound.play()
-            self.dashing = True
-            self.dash_timer = 0
-            self.can_dash = False  # Prevents multiple dashes before touching the ground
-            self.dash_velocity = self.dash_speed if self.last_movement == 'right' else -self.dash_speed
-
-        if self.dashing:
-            if self.dash_duration > 0:
-                self.x += self.dash_velocity
-                self.dash_duration -= 1
-            else:
-                self.dashing = False
-                self.dash_duration = 6
-                self.dash_velocity = 0
-
-        # Prevent falling through the ground
-        if self.y >= 540:
-            self.y = 540
-            self.falling = False
-            self.can_dash = True  # Reset dash when touching the ground
-
-        # Prevent going out of bounds
-        self.x = max(0, min(self.x, 1248))
-
-    def draw(self):
-        """Updates player state and draws it on the screen."""
-        # Update the position of the player's rectangle and hitbox
-        self.rect.topleft = (self.x, self.y)
-        self.hitbox.topleft = (self.x, self.y + 58)
-
-        # Update mask for collision
-        self.mask = pygame.mask.from_surface(self.image)
-
-        # Draw health
-        health_states = [health_full, health1, health2, health3, health_empty]
-        screen.blit(health_states[max(0, 4 - self.health)], (20, 15))
-
-        if self.dash_timer <= 29:
-            screen.blit(dash_empty, (150, 15))
-
-        if self.dash_timer >= 30:
-            screen.blit(dash3, (150, 15))
-
-        if self.dash_timer >= 60:
-            screen.blit(dash2, (150, 15))
-
-        if self.dash_timer >= 90:
-            screen.blit(dash1, (150, 15))
-
-        if self.dash_timer >= 120:
-            screen.blit(dash_full, (150, 15))
-
-        # Draw player
-        screen.blit(self.image, (self.x, self.y))
-
-        '''# --- Debugging: Draw the mask ---
-        # Create a surface from the mask to visualize it
-        mask_surface = self.mask.to_surface()
-        mask_surface.set_colorkey((0, 0, 0))  # Make black (transparent) pixels invisible
-
-        # Draw the mask over the player at the same position
-        screen.blit(mask_surface, self.rect.topleft)'''
 
 class Saw_boss(pygame.sprite.Sprite):
     def __init__(self, x, y):
@@ -529,11 +377,11 @@ class Hammer(pygame.sprite.Sprite):
             self.firing_right = True
 
         if self.firing_right:
-            hammer_1.draw()
+            self.draw()
             self.x += self.movement_speed
 
         if self.firing_left:
-            hammer_1.draw()
+            self.draw()
             self.x -= self.movement_speed
 
         if self.x > 1280 or self.x < 0:
@@ -553,7 +401,7 @@ class Hammer(pygame.sprite.Sprite):
             self.firing_timer = 0
 
         if self.firing_up:
-            hammer_1.draw()
+            self.draw()
             self.y -= self.movement_speed
 
         if self.y <= 0:
@@ -961,7 +809,7 @@ class GameState:
             screen.blit(hammer_img, (270, 510))
 
         # drawing player and early assignments
-        player_1_intro.draw()
+        player_1_intro.draw(screen, health_states, dash_states)
         player_1_intro.movement = True
 
         hammer_1.firing_timer += 1
@@ -1083,7 +931,7 @@ class GameState:
 
         # final calling after everything else
         if player_1_intro.movement:
-            player_1_intro.move()
+            player_1_intro.move(pressed_key, jump_sound, dash_sound)
             if not hammer_1.intro_shown:
                 hammer_1.move()
 
@@ -1134,8 +982,8 @@ class GameState:
                 ]
 
         # calling player to screen
-        player_1.draw()
-        player_1.move()
+        player_1.draw(screen, health_states, dash_states)
+        player_1.move(pressed_key, jump_sound, dash_sound)
 
         # code for the big guy moving
         if big_disc_1.timer < big_guys_time + 120 and big_disc_1.second_phase:
@@ -1487,10 +1335,10 @@ class GameState:
                 bigscrew1.x -= bigscrew1.movement_speed
 
         # calling player to screen
-        player_1.draw()
+        player_1.draw(screen, health_states, dash_states)
         if not bigscrew1.opening_shown:
             player_1.movement = True
-            player_1.move()
+            player_1.move(pressed_key, jump_sound, dash_sound)
         if not player_1.game_over and not bigscrew1.opening_shown:
             hammer_1.firing_timer += 1
             hammer_1.move()
@@ -1786,8 +1634,8 @@ class GameState:
                     hammer_1.firing_side = False
 
         # calling player and hammer to screen
-        player_1.draw()
-        player_1.move()
+        player_1.draw(screen, health_states, dash_states)
+        player_1.move(pressed_key, jump_sound, dash_sound)
         hammer_1.firing_timer += 1
         if not player_1.game_over and not saw_boss1.beginning_movement:
             player_1.movement = True
@@ -1902,7 +1750,7 @@ class GameState:
             method()
 
 # general class calling
-player_1 = Player(100, 540)
+player_1 = player.Player(100, 540, player_img)
 hammer_1 = Hammer(100, 600)
 controller_reference = Controller_references()
 
@@ -1930,7 +1778,7 @@ right_button3 = button.Button(1150, 350, right_arrow, 1)
 applybut = button.Button(240, 500, apply_button, 1)
 
 # intro class calling
-player_1_intro = Player(20, 540)
+player_1_intro = player.Player(20, 540, player_img)
 
 # level 1 class calling
 littledisc1 = little_disc.Little_disc(465, 250, little_disc_img)  # bottom left disc
@@ -2009,7 +1857,7 @@ while running:
             running = False
 
     clock.tick(FPS)
-    keys = pygame.key.get_pressed()
+    keys = pressed_key = pygame.key.get_pressed()
     game_state.state_manager()
 
     pygame.display.flip()
