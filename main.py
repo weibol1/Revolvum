@@ -348,11 +348,11 @@ class GameState:
             webbrowser.open("https://www.youtube.com/@GhastlyGamez")
             options_reference.link_timer = 0
 
-        if discord_button.draw(screen) and options_reference.link_timer >= 5:
+        elif discord_button.draw(screen) and options_reference.link_timer >= 5:
             webbrowser.open("https://discord.gg/jB7gUKPDK7")
             options_reference.link_timer = 0
 
-        if website_button.draw(screen) and options_reference.link_timer >= 5:
+        elif website_button.draw(screen) and options_reference.link_timer >= 5:
             webbrowser.open("https://www.ghastlygames.net")
             options_reference.link_timer = 0
 
@@ -1425,7 +1425,6 @@ class GameState:
         game_end_text3 = game_end_font.render('our Gamejam!', True, (255, 255, 255))
         game_end_text4 = game_end_font2.render('Click our links below to stay updated!', True, (255, 255, 255))
 
-
         screen.blit(game_end_text1, (50, 20))
         screen.blit(game_end_text2, (100, 150))
         screen.blit(game_end_text3, (150, 280))
@@ -1441,11 +1440,11 @@ class GameState:
             webbrowser.open("https://www.youtube.com/@GhastlyGamez")
             options_reference.link_timer = 0
 
-        if discord_button2.draw(screen) and options_reference.link_timer >= 5:
+        elif discord_button2.draw(screen) and options_reference.link_timer >= 5:
             webbrowser.open("https://discord.gg/jB7gUKPDK7")
             options_reference.link_timer = 0
 
-        if website_button2.draw(screen) and options_reference.link_timer >= 5:
+        elif website_button2.draw(screen) and options_reference.link_timer >= 5:
             webbrowser.open("https://www.ghastlygames.net")
             options_reference.link_timer = 0
 
@@ -1531,28 +1530,17 @@ saw_blade1 = saw_blade.Saw_blade(-300, 100, saw_img)
 little_screw = [littlescrew1, littlescrew2, littlescrew3, littlescrew4, littlescrew5, littlescrew6,
                         littlescrew7, littlescrew8, littlescrew9, littlescrew10]
 
-hammer_group = pygame.sprite.Group()
-hammer_group.add(hammer_1)
-
 player_group = pygame.sprite.Group()
 player_group.add(player_1)
 
 second_screw_group = pygame.sprite.Group()
 second_screw_group.add(littlescrew11)
 
-enemy_group = pygame.sprite.Group()
-enemy_group.add(big_disc_1)
-enemy_group.add(bigscrew1)
-
 screw_group = pygame.sprite.Group()
 screw_group.add(littlescrew12)
 
 for screw in little_screw:
-    enemy_group.add(screw)
     screw_group.add(screw)
-
-for disc in littlediscs:
-    enemy_group.add(disc)
 
 enemy_group2 = pygame.sprite.Group()
 enemy_group2.add(saw_blade1)
