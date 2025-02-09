@@ -367,7 +367,6 @@ class GameState:
         credit3_text = credits_font.render('Lead Programmer & Art Designer: Corey Stuckey', True, (255, 255, 255))
         credit4_text = credits_font.render('Assistant Developer & Consultant: woogotheboogo', True, (255, 255, 255))
         credit5_text = credits_font.render('Audio Design: Crusty Trayson', True, (255, 255, 255))
-        credit6_text = credits_font.render('Sound Design: Jakeb Ranew', True, (255, 255, 255))
         credit7_text = esc_font.render('Press [ESC] to Exit', True, (255, 255, 255))
 
         # blitting normal credits
@@ -376,7 +375,6 @@ class GameState:
         screen.blit(credit3_text, (100, 225))
         screen.blit(credit4_text, (100, 300))
         screen.blit(credit5_text, (100, 375))
-        # screen.blit(credit6_text, (100, 450))
         screen.blit(credit7_text, (400, 625))
 
         if keys[pygame.K_ESCAPE]:
