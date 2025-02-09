@@ -44,7 +44,6 @@ class Player(pygame.sprite.Sprite):
 
         # Game over
         self.game_over = False
-        self.game_over_timer = 0
 
         # Pygame mask (for pixel-perfect collision)
         self.mask = pygame.mask.from_surface(self.image)

@@ -44,4 +44,4 @@ class Little_screw(pygame.sprite.Sprite):
         screen.blit(self.image, self.rect.topleft)
 
         # Uncomment to see the mask rectangle for debugging
-        # pygame.draw.rect(screen, (255, 0, 0), self.rect, 2)
+        pygame.draw.rect(screen, (255, 0, 0), self.rect, 2)

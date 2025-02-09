@@ -222,7 +222,8 @@ def game_over_func():
         hammer_1.firing_side = False
         player_1.movement = False
         player_1.is_jumping = False
-        if player_1.game_over_timer < 240:
+        
+        if options_reference.game_over_num != 0:
             screen.blit(game_over_img, (0, 0))
 
             game_over_font = pygame.font.Font(resource_path('assets/fonts/FieldGuide.ttf'), 144)
@@ -236,19 +237,18 @@ def game_over_func():
                 options_reference.game_over_num -= 1
                 options_reference.game_over_timer = 0
 
-    if player_1.game_over_timer >= 240:
+    if options_reference.game_over_num == 0:
         player_1.x = 100
         player_1.y = 540
-        player_1.game_over_timer = 0
         player_1.game_over = False
-        options_reference.game_over_num = 6
+        options_reference.game_over_num = 3
         options_reference.game_over_timer = 0
         player_1.health = 4
         player_1.movement = True
 
 class GameState:
     def __init__(self):
-        self.state = 'mainmenu'
+        self.state = 'level2'
         self.music_playing = False
         self.current_music = None  # Track the currently playing music
         self.intro_played = False  # Flag to track if intro music has been played
@@ -798,7 +798,6 @@ class GameState:
             hammer_1.move(pressed_key, hammer_sound, player_1.x, player_1.y, player_1_intro.x, player_1_intro.y, game_state.state, screen)
 
         if player_1.health <= 0:
-            player_1.game_over_timer += 1
             player_1.game_over = True
 
         if player_1.game_over:
@@ -1065,7 +1064,6 @@ class GameState:
             hammer_1.move(pressed_key, hammer_sound, player_1.x, player_1.y, player_1_intro.x, player_1_intro.y, game_state.state, screen)
 
         if player_1.health <= 0:
-            player_1.game_over_timer += 1
             player_1.game_over = True
 
         if bigscrew1.killed or player_1.game_over:
@@ -1163,7 +1161,7 @@ class GameState:
                 screen.blit(caution, (600, 250))
 
             if saw_boss1.phase_1_attack_timer >= 180:
-                saw_boss1.first_time = False  # cutting the first time off so that everything defualts to second caution
+                saw_boss1.first_time = False  # cutting the first time off so that everything defaults to second caution
 
             # this is for every caution after the first one
             if saw_boss1.y < 100 and saw_boss1.phase_1_attack_timer >= 90 and not saw_boss1.first_time:
@@ -1364,7 +1362,6 @@ class GameState:
 
         # game over condition for the player
         if player_1.health <= 0:
-            player_1.game_over_timer += 1
             player_1.game_over = True
 
         if saw_boss1.killed or player_1.game_over:

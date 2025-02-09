@@ -36,4 +36,4 @@ class Saw_blade(pygame.sprite.Sprite):
         screen.blit(self.image, (self.x, self.y))
 
         # Debugging: Uncomment to visualize hitboxes
-        # pygame.draw.rect(screen, (255, 0, 0), self.rect, 2)
+        pygame.draw.rect(screen, (255, 0, 0), self.rect, 2)

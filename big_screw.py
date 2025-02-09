@@ -97,6 +97,8 @@ class Big_Screw(pygame.sprite.Sprite):
         health_bar_x = 448  # Positioning left of guy
         health_bar_y = 35  # Positioning above the guy
 
+        pygame.draw.rect(screen, (255, 0, 0), self.rect, 2)
+
         # Calculate current health width
         current_health_width = (self.health / max_health) * health_bar_width
 

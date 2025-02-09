@@ -50,6 +50,7 @@ class Saw_boss(pygame.sprite.Sprite):
 
         # Mask for accurate collisions
         self.update_hitbox()
+        
 
     def update_hitbox(self):
         """Ensures the hitbox and mask update correctly every frame."""
@@ -134,7 +135,7 @@ class Saw_boss(pygame.sprite.Sprite):
         screen.blit(self.image, (self.x, self.y))
 
         # Debugging hitbox visualization (uncomment if needed)
-        # pygame.draw.rect(screen, (255, 0, 0), self.rect, 2)
+        pygame.draw.rect(screen, (255, 0, 0), self.rect, 2)
 
         # Draw health bar
         if self.health_shown:
